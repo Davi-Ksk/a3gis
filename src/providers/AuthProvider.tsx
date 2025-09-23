@@ -34,13 +34,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [])
 
-  const login = (data: { token: string; user: User }) => {
-    setToken(data.token);
-    setUser(data.user);
-    localStorage.setItem("authToken", data.token);
-    localStorage.setItem("currentUser", JSON.stringify(data.user));
-    // IMPORTANTE: Adicione um redirecionamento para o dashboard após o login bem-sucedido
-    window.location.href = "/dashboard";
+  const login = (token: string, user: User) => {
+    setToken(token);
+    setUser(user);
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("currentUser", JSON.stringify(user));
   };
 
   const logout = () => {

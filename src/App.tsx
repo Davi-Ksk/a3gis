@@ -7,6 +7,7 @@ import { DashboardPage } from "./pages/DashboardPage"
 import { ProjectDetailPage } from "./pages/ProjectDetailPage"
 import { UsersPage } from "./pages/UsersPage"
 import { TeamsPage } from "./pages/TeamsPage"
+import { ProjectPage } from "./pages/ProjectPage"
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="project/:projectId" element={<ProjectDetailPage />} />
-            <Route path="projects" element={<DashboardPage />} />
+            <Route path="projects" element={<ProjectPage />} />
 
             {/* Admin only routes */}
             <Route
