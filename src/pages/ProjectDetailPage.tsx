@@ -1,82 +1,110 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { useParams } from "react-router-dom"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Badge } from "../components/ui/badge"
-import { Button } from "../components/ui/button"
-import { Alert, AlertDescription } from "../components/ui/alert"
-import { useProject } from "../features/projects/hooks/useProject"
-import { useProjectTasks } from "../features/projects/hooks/useProjectTasks"
-import { KanbanBoard } from "../features/tasks/components/KanbanBoard"
-import { TaskForm } from "../features/tasks/components/TaskForm"
-import { Calendar, User, Loader2, BarChart3, CheckCircle, Clock, AlertTriangle, Plus } from "lucide-react"
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Alert, AlertDescription } from "../components/ui/alert";
+import { useProject } from "../features/projects/hooks/useProject";
+import { useProjectTasks } from "../features/projects/hooks/useProjectTasks";
+import { KanbanBoard } from "../features/tasks/components/KanbanBoard";
+import { TaskForm } from "../features/tasks/components/TaskForm";
+import {
+  Calendar,
+  User,
+  Loader2,
+  BarChart3,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+  Plus,
+} from "lucide-react";
 
 export const ProjectDetailPage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>()
-  const id = Number.parseInt(projectId || "0")
-  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
+  const { projectId } = useParams<{ projectId: string }>();
+  const id = Number.parseInt(projectId || "0");
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
 
-  const { project, isLoading: projectLoading, error: projectError } = useProject(id)
-  const { tasks, isLoading: tasksLoading, error: tasksError, refetch: refetchTasks } = useProjectTasks(id)
+  const {
+    project,
+    isLoading: projectLoading,
+    error: projectError,
+  } = useProject(id);
+  const {
+    tasks,
+    isLoading: tasksLoading,
+    error: tasksError,
+    refetch: refetchTasks,
+  } = useProjectTasks(id);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR")
-  }
+    return new Date(dateString).toLocaleDateString("pt-BR");
+  };
 
   const getStatusColor = (status?: string) => {
     switch (status) {
       case "ATIVO":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "CONCLUIDO":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "CANCELADO":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getTaskStatusColor = (status: string) => {
     switch (status) {
       case "PENDENTE":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "EM_ANDAMENTO":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "CONCLUIDO":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "CANCELADO":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // Calculate task statistics
   const taskStats = React.useMemo(() => {
-    const total = tasks.length
-    const pending = tasks.filter((t) => t.status === "PENDENTE").length
-    const inProgress = tasks.filter((t) => t.status === "EM_ANDAMENTO").length
-    const completed = tasks.filter((t) => t.status === "CONCLUIDO").length
-    const cancelled = tasks.filter((t) => t.status === "CANCELADO").length
+    const total = tasks.length;
+    const pending = tasks.filter((t) => t.status === "PENDENTE").length;
+    const inProgress = tasks.filter((t) => t.status === "EM_ANDAMENTO").length;
+    const completed = tasks.filter((t) => t.status === "CONCLUIDA").length;
+    const cancelled = tasks.filter((t) => t.status === "CANCELADA").length;
 
-    const progress = total > 0 ? Math.round((completed / total) * 100) : 0
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-    return { total, pending, inProgress, completed, cancelled, progress }
-  }, [tasks])
+    return { total, pending, inProgress, completed, cancelled, progress };
+  }, [tasks]);
 
   const handleCreateTask = () => {
-    setIsTaskFormOpen(true)
-  }
+    setIsTaskFormOpen(true);
+  };
 
   const handleTaskFormClose = () => {
-    setIsTaskFormOpen(false)
-  }
+    setIsTaskFormOpen(false);
+  };
 
   const handleTaskFormSuccess = () => {
-    refetchTasks()
-  }
+    refetchTasks();
+  };
 
   if (projectLoading) {
     return (
@@ -84,15 +112,17 @@ export const ProjectDetailPage: React.FC = () => {
         <Loader2 className="h-8 w-8 animate-spin" />
         <span className="ml-2">Carregando projeto...</span>
       </div>
-    )
+    );
   }
 
   if (projectError || !project) {
     return (
       <Alert variant="destructive">
-        <AlertDescription>{projectError || "Projeto não encontrado"}</AlertDescription>
+        <AlertDescription>
+          {projectError || "Projeto não encontrado"}
+        </AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -102,7 +132,11 @@ export const ProjectDetailPage: React.FC = () => {
         <div>
           <div className="flex items-center space-x-3">
             <h1 className="text-3xl font-bold text-gray-900">{project.nome}</h1>
-            {project.status && <Badge className={getStatusColor(project.status)}>{project.status}</Badge>}
+            {project.status && (
+              <Badge className={getStatusColor(project.status)}>
+                {project.status}
+              </Badge>
+            )}
           </div>
           <p className="text-gray-600 mt-2">{project.descricao}</p>
         </div>
@@ -133,7 +167,9 @@ export const ProjectDetailPage: React.FC = () => {
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-sm">{project.responsavel?.nomeCompleto || "Não definido"}</div>
+            <div className="text-sm">
+              {project.responsavel?.nomeCompleto || "Não definido"}
+            </div>
           </CardContent>
         </Card>
 
@@ -173,7 +209,9 @@ export const ProjectDetailPage: React.FC = () => {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Em Andamento
+                </CardTitle>
                 <AlertTriangle className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
@@ -183,7 +221,9 @@ export const ProjectDetailPage: React.FC = () => {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Concluídas</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Concluídas
+                </CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
@@ -193,7 +233,9 @@ export const ProjectDetailPage: React.FC = () => {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Canceladas</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Canceladas
+                </CardTitle>
                 <AlertTriangle className="h-4 w-4 text-red-600" />
               </CardHeader>
               <CardContent>
@@ -228,5 +270,5 @@ export const ProjectDetailPage: React.FC = () => {
         projectId={id}
       />
     </div>
-  )
-}
+  );
+};

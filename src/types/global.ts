@@ -1,4 +1,5 @@
 import { UserProfile } from "@/features/users/dtos/User.dto";
+import { StatusTarefa } from "@/features/tasks/dtos/Task.dto";
 
 export interface User {
   id: number;
@@ -44,7 +45,7 @@ export interface Task {
   responsavelId: number;
   projeto?: Project;
   responsavel?: User;
-  status: "PENDENTE" | "EM_ANDAMENTO" | "CONCLUIDO" | "CANCELADO";
+  status: StatusTarefa;
   createdAt?: string;
   updatedAt?: string;
 }

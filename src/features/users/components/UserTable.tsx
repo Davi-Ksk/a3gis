@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
 import { Button } from "../../../components/ui/button";
 import {
   Table,
@@ -39,18 +38,18 @@ export const UserTable: React.FC<UserTableProps> = ({
   onEdit,
   onRefresh,
 }) => {
-  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
   const { deleteUser, isLoading: isDeleting } = useDeleteUser();
 
+  const currentUser = localStorage.getItem(
+    "currentUser"
+  ) as UserResponse | null;
+
   const handleDelete = async (userId: number) => {
-    setDeletingUserId(userId);
     try {
       await deleteUser(userId);
       onRefresh();
     } catch (error) {
-      // Error is handled by the hook
-    } finally {
-      setDeletingUserId(null);
+      console.error("Erro ao excluir usuário:", error);
     }
   };
 
@@ -109,9 +108,9 @@ export const UserTable: React.FC<UserTableProps> = ({
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={isDeleting && deletingUserId === user.id}
+                          disabled={isDeleting || currentUser?.id === user.id}
                         >
-                          {isDeleting && deletingUserId === user.id ? (
+                          {isDeleting ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <Trash2 className="h-4 w-4" />

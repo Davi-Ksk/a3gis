@@ -29,7 +29,7 @@ export interface TaskResponse {
     nomeCompleto: string
     email: string
   }
-  status: "PENDENTE" | "EM_ANDAMENTO" | "CONCLUIDO" | "CANCELADO"
+  status: StatusTarefa
   createdAt?: string
   updatedAt?: string
 }
@@ -37,12 +37,19 @@ export interface TaskResponse {
 export interface TaskHistoryResponse {
   id: number
   tarefaId: number
-  statusAnterior: string
-  statusNovo: string
+  statusAnterior: StatusTarefa
+  statusNovo: StatusTarefa
   dataAlteracao: string
   usuarioId: number
   usuario?: {
     id: number
     nomeCompleto: string
   }
+}
+
+export enum StatusTarefa {
+  PENDENTE = "PENDENTE",
+  EM_ANDAMENTO = "EM_ANDAMENTO",
+  CONCLUIDA = "CONCLUIDA",
+  CANCELADA = "CANCELADA",
 }

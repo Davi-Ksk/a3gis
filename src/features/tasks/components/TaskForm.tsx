@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "../../../components/ui/button"
-import { Input } from "../../../components/ui/input"
-import { Textarea } from "../../../components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Textarea } from "../../../components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -13,33 +19,38 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog"
-import { Alert, AlertDescription } from "../../../components/ui/alert"
-import type { CreateTaskRequest } from "../dtos/Task.dto"
-import { useCreateTask } from "../hooks/useCreateTask"
-import { useUsers } from "../../users/hooks/useUsers"
-import { useProjects } from "../../projects/hooks/useProjects"
-import { Loader2 } from "lucide-react"
+} from "../../../components/ui/dialog";
+import { Alert, AlertDescription } from "../../../components/ui/alert";
+import type { CreateTaskRequest } from "../dtos/Task.dto";
+import { useCreateTask } from "../hooks/useCreateTask";
+import { useUsers } from "../../users/hooks/useUsers";
+import { useProjects } from "../../projects/hooks/useProjects";
+import { Loader2 } from "lucide-react";
 
 interface TaskFormProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
-  projectId?: number
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  projectId?: number;
 }
 
-export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSuccess, projectId }) => {
+export const TaskForm: React.FC<TaskFormProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  projectId,
+}) => {
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
     dataFimPrevista: "",
     projetoId: projectId?.toString() || "",
     responsavelId: "",
-  })
+  });
 
-  const { createTask, isLoading, error } = useCreateTask()
-  const { users } = useUsers()
-  const { projects } = useProjects()
+  const { createTask, isLoading, error } = useCreateTask();
+  const { users } = useUsers();
+  const { projects } = useProjects();
 
   useEffect(() => {
     if (!isOpen) {
@@ -49,42 +60,46 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSuccess, 
         dataFimPrevista: "",
         projetoId: projectId?.toString() || "",
         responsavelId: "",
-      })
+      });
     }
-  }, [isOpen, projectId])
+  }, [isOpen, projectId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       const taskData: CreateTaskRequest = {
         ...formData,
         projetoId: Number.parseInt(formData.projetoId),
         responsavelId: Number.parseInt(formData.responsavelId),
-      }
+      };
 
-      await createTask(taskData)
-      onSuccess()
-      onClose()
+      await createTask(taskData);
+      onSuccess();
+      onClose();
     } catch (error) {
-      // Error is handled by the hook
+      console.error("Erro ao criar tarefa:", error);
     }
-  }
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Criar Nova Tarefa</DialogTitle>
-          <DialogDescription>Preencha as informações para criar uma nova tarefa.</DialogDescription>
+          <DialogDescription>
+            Preencha as informações para criar uma nova tarefa.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,7 +160,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSuccess, 
               </label>
               <Select
                 value={formData.responsavelId}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, responsavelId: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, responsavelId: value }))
+                }
                 disabled={isLoading}
               >
                 <SelectTrigger>
@@ -169,7 +186,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSuccess, 
               </label>
               <Select
                 value={formData.projetoId}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, projetoId: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, projetoId: value }))
+                }
                 disabled={isLoading}
               >
                 <SelectTrigger>
@@ -187,7 +206,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSuccess, 
           )}
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
@@ -204,5 +228,5 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, onSuccess, 
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
