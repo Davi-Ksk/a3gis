@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "../../../components/ui/button"
-import { Input } from "../../../components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -12,21 +18,31 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/ui/dialog"
-import { Alert, AlertDescription } from "../../../components/ui/alert"
-import type { CreateUserRequest, UpdateUserRequest, UserResponse } from "../dtos/User.dto"
-import { useCreateUser } from "../hooks/useCreateUser"
-import { useUpdateUser } from "../hooks/useUpdateUser"
-import { Loader2 } from "lucide-react"
+} from "../../../components/ui/dialog";
+import { Alert, AlertDescription } from "../../../components/ui/alert";
+import {
+  CreateUserRequest,
+  UpdateUserRequest,
+  UserProfile,
+  UserResponse,
+} from "../dtos/User.dto";
+import { useCreateUser } from "../hooks/useCreateUser";
+import { useUpdateUser } from "../hooks/useUpdateUser";
+import { Loader2 } from "lucide-react";
 
 interface UserFormProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
-  user?: UserResponse | null
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  user?: UserResponse | null;
 }
 
-export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, user }) => {
+export const UserForm: React.FC<UserFormProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  user,
+}) => {
   const [formData, setFormData] = useState({
     nomeCompleto: "",
     cpf: "",
@@ -34,15 +50,23 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
     cargo: "",
     login: "",
     senha: "",
-    perfil: "USUARIO" as "ADMINISTRADOR" | "USUARIO",
-  })
+    perfil: "" as unknown as UserProfile,
+  });
 
-  const { createUser, isLoading: isCreating, error: createError } = useCreateUser()
-  const { updateUser, isLoading: isUpdating, error: updateError } = useUpdateUser()
+  const {
+    createUser,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateUser();
+  const {
+    updateUser,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateUser();
 
-  const isEditing = !!user
-  const isLoading = isCreating || isUpdating
-  const error = createError || updateError
+  const isEditing = !!user;
+  const isLoading = isCreating || isUpdating;
+  const error = createError || updateError;
 
   useEffect(() => {
     if (user) {
@@ -54,7 +78,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
         login: user.login,
         senha: "",
         perfil: user.perfil,
-      })
+      });
     } else {
       setFormData({
         nomeCompleto: "",
@@ -63,44 +87,46 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
         cargo: "",
         login: "",
         senha: "",
-        perfil: "USUARIO",
-      })
+        perfil: UserProfile.COLABORADOR,
+      });
     }
-  }, [user, isOpen])
+  }, [user, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       if (isEditing && user) {
-        const updateData: UpdateUserRequest = { ...formData }
+        const updateData: UpdateUserRequest = { ...formData };
         if (!updateData.senha) {
-          delete updateData.senha
+          delete updateData.senha;
         }
-        await updateUser(user.id, updateData)
+        await updateUser(user.id, updateData);
       } else {
-        await createUser(formData as CreateUserRequest)
+        await createUser(formData as CreateUserRequest);
       }
-      onSuccess()
-      onClose()
+      onSuccess();
+      onClose();
     } catch (error) {
       // Error is handled by the hooks
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Editar Usuário" : "Criar Novo Usuário"}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Editar Usuário" : "Criar Novo Usuário"}
+          </DialogTitle>
           <DialogDescription>
             {isEditing
               ? "Atualize as informações do usuário abaixo."
@@ -211,9 +237,12 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
                 Perfil
               </label>
               <Select
-                value={formData.perfil}
-                onValueChange={(value: "ADMINISTRADOR" | "USUARIO") =>
-                  setFormData((prev) => ({ ...prev, perfil: value }))
+                value={formData.perfil.toString()}
+                onValueChange={(value: string) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    perfil: value.toString() as unknown as UserProfile,
+                  }))
                 }
                 disabled={isLoading}
               >
@@ -221,7 +250,8 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USUARIO">Usuário</SelectItem>
+                  <SelectItem value="COLABORADOR">Colaborador</SelectItem>
+                  <SelectItem value="GERENTE">Gerente</SelectItem>
                   <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
                 </SelectContent>
               </Select>
@@ -229,7 +259,12 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
@@ -248,5 +283,5 @@ export const UserForm: React.FC<UserFormProps> = ({ isOpen, onClose, onSuccess, 
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

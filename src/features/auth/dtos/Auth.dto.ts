@@ -1,20 +1,16 @@
+import { UserProfile, UserResponse } from "@/features/users/dtos/User.dto";
+
 export interface LoginRequest {
-  login: string
-  senha: string
+  login: string;
+  senha: string;
 }
 
 export interface LoginResponse {
-  token: string
-  user?: {
-    id: number
-    nomeCompleto: string
-    email: string
-    login: string
-    perfil: "ADMINISTRADOR" | "USUARIO"
-  }
+  token: string;
+  user?: UserResponse;
 }
 
 export interface AuthError {
-  message: string
-  status: number
+  message: string;
+  status: number;
 }
