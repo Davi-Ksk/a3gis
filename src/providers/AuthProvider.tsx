@@ -1,38 +1,45 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import type { User } from "../types/global"
+import type React from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
+import type { User } from "../types/global";
+import { UserProfile } from "@/features/users/dtos/User.dto";
 
 interface AuthContextType {
-  user: User | null
-  token: string | null
-  login: (token: string, user: User) => void
-  logout: () => void
-  isAuthenticated: boolean
-  isAdmin: boolean
+  user: User | null;
+  token: string | null;
+  login: (token: string, user: User) => void;
+  logout: () => void;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for stored auth data on mount
-    const storedToken = localStorage.getItem("authToken")
-    const storedUser = localStorage.getItem("currentUser")
+    const storedToken = localStorage.getItem("authToken");
+    const storedUser = localStorage.getItem("currentUser");
 
     if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
     }
-  }, [])
+  }, []);
 
   const login = (token: string, user: User) => {
     setToken(token);
@@ -42,14 +49,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    setToken(null)
-    setUser(null)
-    localStorage.removeItem("authToken")
-    localStorage.removeItem("currentUser")
-  }
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("currentUser");
+  };
 
-  const isAuthenticated = !!token && !!user
-  const isAdmin = user?.perfil === "ADMINISTRADOR"
+  const isAuthenticated = !!token && !!user;
+  const isAdmin = user?.perfil === UserProfile.ADMINISTRADOR;
 
   return (
     <AuthContext.Provider
@@ -64,13 +71,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
-}
+  return context;
+};

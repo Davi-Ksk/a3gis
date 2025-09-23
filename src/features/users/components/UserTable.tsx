@@ -1,10 +1,17 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Button } from "../../../components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table"
-import { Badge } from "../../../components/ui/badge"
+import type React from "react";
+import { useState } from "react";
+import { Button } from "../../../components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import { Badge } from "../../../components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,32 +22,36 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../../components/ui/alert-dialog"
-import type { UserResponse } from "../dtos/User.dto"
-import { useDeleteUser } from "../hooks/useDeleteUser"
-import { Edit, Trash2, Loader2 } from "lucide-react"
+} from "../../../components/ui/alert-dialog";
+import { UserProfile, type UserResponse } from "../dtos/User.dto";
+import { useDeleteUser } from "../hooks/useDeleteUser";
+import { Edit, Trash2, Loader2 } from "lucide-react";
 
 interface UserTableProps {
-  users: UserResponse[]
-  onEdit: (user: UserResponse) => void
-  onRefresh: () => void
+  users: UserResponse[];
+  onEdit: (user: UserResponse) => void;
+  onRefresh: () => void;
 }
 
-export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onRefresh }) => {
-  const [deletingUserId, setDeletingUserId] = useState<number | null>(null)
-  const { deleteUser, isLoading: isDeleting } = useDeleteUser()
+export const UserTable: React.FC<UserTableProps> = ({
+  users,
+  onEdit,
+  onRefresh,
+}) => {
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
+  const { deleteUser, isLoading: isDeleting } = useDeleteUser();
 
   const handleDelete = async (userId: number) => {
-    setDeletingUserId(userId)
+    setDeletingUserId(userId);
     try {
-      await deleteUser(userId)
-      onRefresh()
+      await deleteUser(userId);
+      onRefresh();
     } catch (error) {
       // Error is handled by the hook
     } finally {
-      setDeletingUserId(null)
+      setDeletingUserId(null);
     }
-  }
+  };
 
   return (
     <div className="rounded-md border">
@@ -65,22 +76,40 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onRefresh }
           ) : (
             users.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.nomeCompleto}</TableCell>
+                <TableCell className="font-medium">
+                  {user.nomeCompleto}
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.cargo}</TableCell>
                 <TableCell>{user.login}</TableCell>
                 <TableCell>
-                  <Badge variant={user.perfil === "ADMINISTRADOR" ? "default" : "secondary"}>{user.perfil}</Badge>
+                  <Badge
+                    variant={
+                      user.perfil === UserProfile.ADMINISTRADOR
+                        ? "default"
+                        : "secondary"
+                    }
+                  >
+                    {user.perfil.toString()}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => onEdit(user)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(user)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm" disabled={isDeleting && deletingUserId === user.id}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isDeleting && deletingUserId === user.id}
+                        >
                           {isDeleting && deletingUserId === user.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
@@ -90,9 +119,12 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onRefresh }
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                          <AlertDialogTitle>
+                            Confirmar exclusão
+                          </AlertDialogTitle>
                           <AlertDialogDescription>
-                            Tem certeza que deseja excluir o usuário "{user.nomeCompleto}"? Esta ação não pode ser
+                            Tem certeza que deseja excluir o usuário "
+                            {user.nomeCompleto}"? Esta ação não pode ser
                             desfeita.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -115,5 +147,5 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onRefresh }
         </TableBody>
       </Table>
     </div>
-  )
-}
+  );
+};
