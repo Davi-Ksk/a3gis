@@ -7,6 +7,7 @@ import {
   useState,
   useEffect,
   type ReactNode,
+  useMemo,
 } from "react";
 import type { User } from "../types/global";
 import { UserProfile } from "@/features/users/dtos/User.dto";
@@ -31,7 +32,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for stored auth data on mount
     const storedToken = localStorage.getItem("authToken");
     const storedUser = localStorage.getItem("currentUser");
 
@@ -58,19 +58,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAuthenticated = !!token && !!user;
   const isAdmin = user?.perfil === UserProfile.ADMINISTRADOR;
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      token,
+      login,
+      logout,
+      isAuthenticated,
+      isAdmin,
+    }),
+    [user, token, login, logout, isAuthenticated, isAdmin]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        login,
-        logout,
-        isAuthenticated,
-        isAdmin,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

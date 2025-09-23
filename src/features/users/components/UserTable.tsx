@@ -26,6 +26,7 @@ import {
 import { UserProfile, type UserResponse } from "../dtos/User.dto";
 import { useDeleteUser } from "../hooks/useDeleteUser";
 import { Edit, Trash2, Loader2 } from "lucide-react";
+import { userProfileToString } from "@/lib/utils";
 
 interface UserTableProps {
   users: UserResponse[];
@@ -90,7 +91,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                         : "secondary"
                     }
                   >
-                    {user.perfil.toString()}
+                    {userProfileToString(user.perfil)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">

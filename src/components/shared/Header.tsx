@@ -1,12 +1,21 @@
 "use client";
 
-import type React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../../providers/AuthProvider";
 import { Button } from "../ui/button";
 import { LogOut, User } from "lucide-react";
+import { userProfileToString } from "@/lib/utils";
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
+  const [userProfile, setUserProfile] = React.useState<string>("");
+
+  useEffect(() => {
+    if (user?.perfil) {
+      console.log(user.perfil);
+      setUserProfile(userProfileToString(user.perfil));
+    }
+  }, [user?.perfil]);
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -21,7 +30,7 @@ export const Header: React.FC = () => {
             <User className="h-4 w-4 text-gray-500" />
             <span className="text-sm text-gray-700">{user?.nomeCompleto}</span>
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-              {user?.perfil.toString()}
+              {userProfile}
             </span>
           </div>
 

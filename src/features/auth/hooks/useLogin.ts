@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../providers/AuthProvider";
 import { loginUser } from "../api/login";
 import type { LoginRequest } from "../dtos/Auth.dto";
-import { UserResponse } from "@/features/users/dtos/User.dto";
+import { UserResponse, UserProfile } from "@/features/users/dtos/User.dto";
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,13 +22,13 @@ export const useLogin = () => {
 
       // Create user object from response
       const user = {
-        id: response.user?.id || 0,
-        nomeCompleto: response.user?.nomeCompleto || "",
-        cpf: "", // Not returned in login response
-        email: response.user?.email || "",
-        cargo: "", // Not returned in login response
-        login: response.user?.login || "",
-        perfil: response.user?.perfil,
+        id: response.usuario?.id || 0,
+        nomeCompleto: response.usuario?.nomeCompleto || "",
+        cpf: response.usuario?.cpf || "",
+        email: response.usuario?.email || "",
+        cargo: response.usuario?.cargo || "",
+        login: response.usuario?.login || "",
+        perfil: response.usuario?.perfil ?? UserProfile.COLABORADOR,
       } as UserResponse;
 
       login(response.token, user);

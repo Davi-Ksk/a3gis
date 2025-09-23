@@ -1,4 +1,4 @@
-import { UserProfile, UserResponse } from "@/features/users/dtos/User.dto";
+import { UserResponse } from "@/features/users/dtos/User.dto";
 
 export interface LoginRequest {
   login: string;
@@ -7,7 +7,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
-  user?: UserResponse;
+  usuario?: UserResponse;
 }
 
 export interface AuthError {

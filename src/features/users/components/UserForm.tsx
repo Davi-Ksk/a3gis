@@ -29,6 +29,7 @@ import {
 import { useCreateUser } from "../hooks/useCreateUser";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { Loader2 } from "lucide-react";
+import { userProfileToString } from "@/lib/utils";
 
 interface UserFormProps {
   isOpen: boolean;
@@ -237,7 +238,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                 Perfil
               </label>
               <Select
-                value={formData.perfil.toString()}
+                value={userProfileToString(formData.perfil)}
                 onValueChange={(value: string) =>
                   setFormData((prev) => ({
                     ...prev,
