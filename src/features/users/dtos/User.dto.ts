@@ -31,7 +31,7 @@ export interface UserResponse {
 }
 
 export enum UserProfile {
-  ADMINISTRADOR,
-  GERENTE,
-  COLABORADOR,
+  ADMINISTRADOR = "ADMINISTRADOR",
+  GERENTE = "GERENTE",
+  COLABORADOR = "COLABORADOR",
 }

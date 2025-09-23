@@ -12,7 +12,6 @@ export const Header: React.FC = () => {
 
   useEffect(() => {
     if (user?.perfil) {
-      console.log(user.perfil);
       setUserProfile(userProfileToString(user.perfil));
     }
   }, [user?.perfil]);
