@@ -38,6 +38,7 @@ interface TaskFormProps {
   onSuccess: () => void;
   projectId?: number;
   task?: TaskResponse; // Added for editing
+  allowedUserIds?: number[]; // New prop for filtering users
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
@@ -46,6 +47,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onSuccess,
   projectId,
   task, // Destructure task prop
+  allowedUserIds, // Destructure new prop
 }) => {
   const [formData, setFormData] = useState({
     titulo: task?.titulo || "",
@@ -200,11 +202,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   <SelectValue placeholder="Selecione um responsável" />
                 </SelectTrigger>
                 <SelectContent>
-                  {users.map((user) => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.nomeCompleto}
-                    </SelectItem>
-                  ))}
+                  {users
+                    .filter(user => !allowedUserIds || allowedUserIds.includes(user.id))
+                    .map((user) => (
+                      <SelectItem key={user.id} value={user.id.toString()}>
+                        {user.nomeCompleto}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

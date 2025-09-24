@@ -90,13 +90,24 @@ export const ProjectDetailPage: React.FC = () => {
   // Calculate task statistics
   const taskStats = React.useMemo(() => {
     const total = tasks.length;
-    const pending = tasks.filter((t) => t.status === StatusTarefa.PENDENTE).length;
-    const inProgress = tasks.filter((t) => t.status === StatusTarefa.EM_ANDAMENTO).length;
-    const completed = tasks.filter((t) => t.status === StatusTarefa.CONCLUIDA).length;
-    const cancelled = tasks.filter((t) => t.status === StatusTarefa.CANCELADA).length;
+    const pending = tasks.filter(
+      (t) => t.status === StatusTarefa.PENDENTE
+    ).length;
+    const inProgress = tasks.filter(
+      (t) => t.status === StatusTarefa.EM_ANDAMENTO
+    ).length;
+    const completed = tasks.filter(
+      (t) => t.status === StatusTarefa.CONCLUIDA
+    ).length;
+    const cancelled = tasks.filter(
+      (t) => t.status === StatusTarefa.CANCELADA
+    ).length;
 
     const totalForProgress = total - cancelled;
-    const progress = totalForProgress > 0 ? Math.round((completed / totalForProgress) * 100) : 0;
+    const progress =
+      totalForProgress > 0
+        ? Math.round((completed / totalForProgress) * 100)
+        : 0;
 
     return { total, pending, inProgress, completed, cancelled, progress };
   }, [tasks]);
@@ -170,12 +181,35 @@ export const ProjectDetailPage: React.FC = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Responsável</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Responsável e Equipes
+            </CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-sm">
-              {project.responsavel?.nomeCompleto || "Não definido"}
+              <div className="flex items-center mb-2">
+                <User className="mr-2 h-4 w-4" />
+                <span>
+                  {project.responsavel?.nomeCompleto || "Não definido"}
+                </span>
+              </div>
+              {project.equipes && project.equipes.length > 0 && (
+                <div className="space-y-1 mt-2">
+                  <div className="text-xs font-medium text-gray-500">
+                    Equipes:
+                  </div>
+                  {project.equipes.map((equipe) => (
+                    <div
+                      key={equipe.id}
+                      className="flex items-center text-xs text-gray-600"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      <span>{equipe.nome}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -275,6 +309,11 @@ export const ProjectDetailPage: React.FC = () => {
         onClose={handleTaskFormClose}
         onSuccess={handleTaskFormSuccess}
         projectId={id}
+        allowedUserIds={
+          project.equipes
+            ?.flatMap((equipe) => equipe.membros?.map((member) => member.id))
+            .filter((id): id is number => typeof id === "number") || []
+        }
       />
     </div>
   );

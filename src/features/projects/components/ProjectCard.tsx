@@ -197,17 +197,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             </div>
           )}
 
-          {project.teams && project.teams.length > 0 && (
+          {project.equipes && project.equipes?.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center text-sm font-medium text-gray-700">
-                <Users className="mr-2 h-4 w-4" />
                 Equipes:
               </div>
-              <div className="flex flex-wrap gap-2">
-                {project.teams.map((team) => (
-                  <Badge key={team.id} variant="secondary">
+              <div className="flex items-center text-sm text-gray-600">
+                <Users className="mr-2 h-4 w-4" />
+                {project.equipes?.map((team) => (
+                  <span className="mr-2" key={team.id}>
                     {team.nome}
-                  </Badge>
+                  </span>
                 ))}
               </div>
             </div>
