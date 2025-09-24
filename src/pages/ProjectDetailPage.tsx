@@ -31,6 +31,7 @@ import {
   AlertTriangle,
   Plus,
 } from "lucide-react";
+import { StatusTarefa } from "../features/tasks/dtos/Task.dto";
 
 export const ProjectDetailPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -66,15 +67,15 @@ export const ProjectDetailPage: React.FC = () => {
     }
   };
 
-  const getTaskStatusColor = (status: string) => {
+  const getTaskStatusColor = (status: StatusTarefa) => {
     switch (status) {
-      case "PENDENTE":
+      case StatusTarefa.PENDENTE:
         return "bg-yellow-100 text-yellow-800";
-      case "EM_ANDAMENTO":
+      case StatusTarefa.EM_ANDAMENTO:
         return "bg-blue-100 text-blue-800";
-      case "CONCLUIDO":
+      case StatusTarefa.CONCLUIDA:
         return "bg-green-100 text-green-800";
-      case "CANCELADO":
+      case StatusTarefa.CANCELADA:
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -82,14 +83,16 @@ export const ProjectDetailPage: React.FC = () => {
   };
 
   // Calculate task statistics
+  // Calculate task statistics
   const taskStats = React.useMemo(() => {
     const total = tasks.length;
-    const pending = tasks.filter((t) => t.status === "PENDENTE").length;
-    const inProgress = tasks.filter((t) => t.status === "EM_ANDAMENTO").length;
-    const completed = tasks.filter((t) => t.status === "CONCLUIDA").length;
-    const cancelled = tasks.filter((t) => t.status === "CANCELADA").length;
+    const pending = tasks.filter((t) => t.status === StatusTarefa.PENDENTE).length;
+    const inProgress = tasks.filter((t) => t.status === StatusTarefa.EM_ANDAMENTO).length;
+    const completed = tasks.filter((t) => t.status === StatusTarefa.CONCLUIDA).length;
+    const cancelled = tasks.filter((t) => t.status === StatusTarefa.CANCELADA).length;
 
-    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const totalForProgress = total - cancelled;
+    const progress = totalForProgress > 0 ? Math.round((completed / totalForProgress) * 100) : 0;
 
     return { total, pending, inProgress, completed, cancelled, progress };
   }, [tasks]);
