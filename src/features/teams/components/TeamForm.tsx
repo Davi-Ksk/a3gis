@@ -7,6 +7,13 @@ import { Input } from "../../../components/ui/input"
 import { Textarea } from "../../../components/ui/textarea"
 import { Checkbox } from "../../../components/ui/checkbox"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -19,6 +26,8 @@ import type { CreateTeamRequest, UpdateTeamRequest, TeamResponse } from "../dtos
 import { useCreateTeam } from "../hooks/useCreateTeam"
 import { useUpdateTeam } from "../hooks/useUpdateTeam"
 import { useUsers } from "../../users/hooks/useUsers"
+import { useProjects } from "../../projects/hooks/useProjects"
+import { useAddTeamToProject } from "../../projects/hooks/useAddTeamToProject"
 import { Loader2 } from "lucide-react"
 
 interface TeamFormProps {
@@ -34,13 +43,16 @@ export const TeamForm: React.FC<TeamFormProps> = ({ isOpen, onClose, onSuccess, 
     descricao: "",
     membroIds: [] as number[],
   })
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
 
   const { createTeam, isLoading: isCreating, error: createError } = useCreateTeam()
   const { updateTeam, isLoading: isUpdating, error: updateError } = useUpdateTeam()
   const { users } = useUsers()
+  const { projects } = useProjects()
+  const { mutate: addTeamToProjectMutation, isPending: isAddingTeam } = useAddTeamToProject()
 
   const isEditing = !!team
-  const isLoading = isCreating || isUpdating
+  const isLoading = isCreating || isUpdating || isAddingTeam
   const error = createError || updateError
 
   useEffect(() => {
@@ -50,12 +62,15 @@ export const TeamForm: React.FC<TeamFormProps> = ({ isOpen, onClose, onSuccess, 
         descricao: team.descricao,
         membroIds: team.membroIds || [],
       })
+      // If editing, we might want to pre-select the project the team is already associated with
+      // This would require fetching team-project associations, which is not currently available
     } else {
       setFormData({
         nome: "",
         descricao: "",
         membroIds: [],
       })
+      setSelectedProjectId(null)
     }
   }, [team, isOpen])
 
@@ -66,7 +81,10 @@ export const TeamForm: React.FC<TeamFormProps> = ({ isOpen, onClose, onSuccess, 
       if (isEditing && team) {
         await updateTeam(team.id, formData as UpdateTeamRequest)
       } else {
-        await createTeam(formData as CreateTeamRequest)
+        const newTeam = await createTeam(formData as CreateTeamRequest)
+        if (selectedProjectId && newTeam) {
+          await addTeamToProjectMutation({ projectId: Number(selectedProjectId), teamId: newTeam.id })
+        }
       }
       onSuccess()
       onClose()
@@ -137,6 +155,36 @@ export const TeamForm: React.FC<TeamFormProps> = ({ isOpen, onClose, onSuccess, 
               rows={3}
             />
           </div>
+
+          {!isEditing && (
+            <div className="space-y-2">
+              <label htmlFor="projeto" className="text-sm font-medium">
+                Adicionar a um Projeto (Opcional)
+              </label>
+              <Select
+                value={selectedProjectId || ""}
+                onValueChange={setSelectedProjectId}
+                disabled={isLoading || projects.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um projeto" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.length === 0 ? (
+                    <SelectItem value="" disabled>
+                      Nenhum projeto disponível
+                    </SelectItem>
+                  ) : (
+                    projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id.toString()}>
+                        {project.nome}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Membros da Equipe</label>

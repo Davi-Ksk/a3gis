@@ -1,3 +1,5 @@
+import type { TeamResponse } from "../../teams/dtos/Team.dto"
+
 export enum StatusProjeto {
   PLANEJADO = "PLANEJADO",
   EM_ANDAMENTO = "EM_ANDAMENTO",
@@ -36,6 +38,7 @@ export interface ProjectResponse {
   status?: StatusProjeto
   createdAt?: string
   updatedAt?: string
+  teams?: TeamResponse[]
 }
 
 export interface ProjectStats {

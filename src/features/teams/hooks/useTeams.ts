@@ -1,35 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { getTeams } from "../api/teams"
 import type { TeamResponse } from "../dtos/Team.dto"
 
 export const useTeams = () => {
-  const [teams, setTeams] = useState<TeamResponse[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchTeams = async () => {
-    try {
-      setIsLoading(true)
-      const data = await getTeams()
-      setTeams(data)
-      setError(null)
-    } catch (err: any) {
-      setError(err.message || "Erro ao carregar equipes")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchTeams()
-  }, [])
+  const { data, isLoading, error, refetch } = useQuery<TeamResponse[], Error>({
+    queryKey: ["teams"],
+    queryFn: getTeams,
+  })
 
   return {
-    teams,
+    teams: data || [],
     isLoading,
-    error,
-    refetch: fetchTeams,
+    error: error ? error.message : null,
+    refetch,
   }
 }

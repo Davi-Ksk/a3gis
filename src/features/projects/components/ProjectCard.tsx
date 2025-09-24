@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -29,6 +30,7 @@ import {
   XCircle,
   Trash2,
   Loader2,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useStartProject } from "../hooks/useStartProject";
@@ -37,6 +39,7 @@ import { useCancelProject } from "../hooks/useCancelProject";
 import { useDeleteProject } from "../hooks/useDeleteProject";
 import { getProjectStatusDisplay } from "../../../lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { AddTeamToProjectModal } from "./AddTeamToProjectModal";
 
 interface ProjectCardProps {
   project: ProjectResponse;
@@ -46,6 +49,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
+  const [isAddTeamModalOpen, setIsAddTeamModalOpen] = useState(false);
 
   const { mutate: startProjectMutation, isPending: isStarting } =
     useStartProject();
@@ -78,6 +82,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     }
   };
 
+  const handleAddTeamSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    setIsAddTeamModalOpen(false);
+  };
+
   const statusDisplay = project.status
     ? getProjectStatusDisplay(project.status)
     : { text: "Desconhecido", color: "bg-gray-100 text-gray-800" };
@@ -88,13 +97,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-lg">{project.nome}</CardTitle>
+            <CardDescription className="mt-1">
+              {project.descricao}
+            </CardDescription>
+          </div>
+          <div className="flex items-center space-x-2">
             {project.status && (
               <Badge className={statusDisplay.color}>
                 {statusDisplay.text}
               </Badge>
             )}
-          </div>
-          <div className="flex items-center space-x-2">
             {isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger>
@@ -146,6 +158,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                       </DropdownMenuItem>
                     )}
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsAddTeamModalOpen(true)}>
+                    <Users className="mr-2 h-4 w-4" />
+                    Adicionar Equipe
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleDeleteProject}
                     disabled={isDeleting}
@@ -165,9 +182,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <CardDescription className="mt-1">
-            {project.descricao}
-          </CardDescription>
           <div className="flex items-center text-sm text-gray-600">
             <Calendar className="mr-2 h-4 w-4" />
             <span>
@@ -180,6 +194,22 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             <div className="flex items-center text-sm text-gray-600">
               <User className="mr-2 h-4 w-4" />
               <span>{project.responsavel.nomeCompleto}</span>
+            </div>
+          )}
+
+          {project.teams && project.teams.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center text-sm font-medium text-gray-700">
+                <Users className="mr-2 h-4 w-4" />
+                Equipes:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {project.teams.map((team) => (
+                  <Badge key={team.id} variant="secondary">
+                    {team.nome}
+                  </Badge>
+                ))}
+              </div>
             </div>
           )}
 
@@ -196,6 +226,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           </div>
         </div>
       </CardContent>
+      <AddTeamToProjectModal
+        isOpen={isAddTeamModalOpen}
+        onClose={() => setIsAddTeamModalOpen(false)}
+        onSuccess={handleAddTeamSuccess}
+        projectId={project.id}
+      />
     </Card>
   );
 };
