@@ -19,6 +19,7 @@ import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { useProject } from "../features/projects/hooks/useProject";
 import { useProjectTasks } from "../features/projects/hooks/useProjectTasks";
+import { useProjectActions } from "../features/projects/hooks/useProjectActions"; // New import
 import { KanbanBoard } from "../features/tasks/components/KanbanBoard";
 import { TaskForm } from "../features/tasks/components/TaskForm";
 import {
@@ -30,8 +31,11 @@ import {
   Clock,
   AlertTriangle,
   Plus,
+  Play,
+  X,
 } from "lucide-react";
 import { StatusTarefa } from "../features/tasks/dtos/Task.dto";
+import { ProjectResponse } from "../features/projects/dtos/Project.dto"; // New import for ProjectResponse
 
 export const ProjectDetailPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();

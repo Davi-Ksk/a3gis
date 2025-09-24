@@ -21,8 +21,8 @@ import {
   DialogTitle,
 } from "../../../components/ui/dialog";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
-import type { CreateTaskRequest } from "../dtos/Task.dto";
-import { useCreateTask } from "../hooks/useCreateTask";
+import type { CreateTaskRequest, UpdateTaskRequest, TaskResponse } from "../dtos/Task.dto";
+import { useTaskActions } from "../hooks/useTaskActions";
 import { useUsers } from "../../users/hooks/useUsers";
 import { useProjects } from "../../projects/hooks/useProjects";
 import { Loader2 } from "lucide-react";
@@ -32,6 +32,7 @@ interface TaskFormProps {
   onClose: () => void;
   onSuccess: () => void;
   projectId?: number;
+  task?: TaskResponse; // Added for editing
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
@@ -39,21 +40,30 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onClose,
   onSuccess,
   projectId,
+  task, // Destructure task prop
 }) => {
   const [formData, setFormData] = useState({
-    titulo: "",
-    descricao: "",
-    dataFimPrevista: "",
-    projetoId: projectId?.toString() || "",
-    responsavelId: "",
+    titulo: task?.titulo || "",
+    descricao: task?.descricao || "",
+    dataFimPrevista: task?.dataFimPrevista.split("T")[0] || "", // Format date for input
+    projetoId: task?.projetoId.toString() || projectId?.toString() || "",
+    responsavelId: task?.responsavelId?.toString() || "",
   });
 
-  const { createTask, isLoading, error } = useCreateTask();
+  const { createTask, updateTask, isLoading, error } = useTaskActions(); // Use useTaskActions
   const { users } = useUsers();
   const { projects } = useProjects();
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && task) {
+      setFormData({
+        titulo: task.titulo,
+        descricao: task.descricao,
+        dataFimPrevista: task.dataFimPrevista.split("T")[0],
+        projetoId: task.projetoId.toString(),
+        responsavelId: task.responsavelId?.toString() || "",
+      });
+    } else if (!isOpen) {
       setFormData({
         titulo: "",
         descricao: "",
@@ -62,23 +72,31 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         responsavelId: "",
       });
     }
-  }, [isOpen, projectId]);
+  }, [isOpen, projectId, task]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const taskData: CreateTaskRequest = {
+      const payload = {
         ...formData,
         projetoId: Number.parseInt(formData.projetoId),
-        responsavelId: Number.parseInt(formData.responsavelId),
+        responsavelId: formData.responsavelId
+          ? Number.parseInt(formData.responsavelId)
+          : undefined,
       };
 
-      await createTask(taskData);
+      if (task) {
+        // Editing existing task
+        await updateTask(task.id, payload as UpdateTaskRequest);
+      } else {
+        // Creating new task
+        await createTask(payload as CreateTaskRequest);
+      }
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("Erro ao criar tarefa:", error);
+      console.error("Erro ao salvar tarefa:", error);
     }
   };
 
@@ -96,9 +114,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Criar Nova Tarefa</DialogTitle>
+                    <DialogTitle>{task ? "Editar Tarefa" : "Criar Nova Tarefa"}</DialogTitle>
           <DialogDescription>
-            Preencha as informações para criar uma nova tarefa.
+            {task
+              ? "Edite as informações da tarefa."
+              : "Preencha as informações para criar uma nova tarefa."}
           </DialogDescription>
         </DialogHeader>
 
@@ -218,8 +238,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Criando...
+                  {task ? "Salvando..." : "Criando..."}
                 </>
+              ) : task ? (
+                "Salvar Alterações"
               ) : (
                 "Criar Tarefa"
               )}

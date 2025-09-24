@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { startTask, completeTask, cancelTask, reopenTask } from "../api/tasks"
+import { startTask, completeTask, cancelTask, reopenTask, deleteTask, updateTask } from "../api/tasks"
 
 export const useTaskActions = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -63,11 +63,41 @@ export const useTaskActions = () => {
     }
   }
 
+  const handleDeleteTask = async (id: number) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      await deleteTask(id)
+    } catch (err: any) {
+      setError(err.message || "Erro ao excluir tarefa")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUpdateTask = async (id: number, taskData: UpdateTaskRequest) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      await updateTask(id, taskData)
+    } catch (err: any) {
+      setError(err.message || "Erro ao atualizar tarefa")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return {
     startTask: handleStartTask,
     completeTask: handleCompleteTask,
     cancelTask: handleCancelTask,
     reopenTask: handleReopenTask,
+    deleteTask: handleDeleteTask,
+    updateTask: handleUpdateTask,
     isLoading,
     error,
     clearError: () => setError(null),

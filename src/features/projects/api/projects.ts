@@ -34,3 +34,15 @@ export const deleteProject = async (id: number): Promise<void> => {
 export const addTeamToProject = async (projectId: number, teamId: number): Promise<void> => {
   await api.post(`/projetos/${projectId}/equipes/${teamId}`)
 }
+
+export const startProject = async (id: number): Promise<void> => {
+  await api.post(`/projetos/${id}/iniciar`)
+}
+
+export const completeProject = async (id: number): Promise<void> => {
+  await api.post(`/projetos/${id}/concluir`)
+}
+
+export const cancelProject = async (id: number): Promise<void> => {
+  await api.post(`/projetos/${id}/cancelar`)
+}

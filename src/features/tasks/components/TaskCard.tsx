@@ -11,8 +11,9 @@ import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import type { TaskResponse } from "../dtos/Task.dto";
 import { StatusTarefa } from "../dtos/Task.dto";
-import { Calendar, User, Play, CheckCircle, X } from "lucide-react";
+import { Calendar, User, Play, CheckCircle, X, Trash2, Edit } from "lucide-react";
 import { useTaskActions } from "../hooks/useTaskActions";
+import { TaskForm } from "./TaskForm";
 
 interface TaskCardProps {
   task: TaskResponse;
@@ -20,9 +21,15 @@ interface TaskCardProps {
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onRefresh }) => {
-  const [activeTask, setActiveTask] = React.useState<TaskResponse | null>(null);
-  const { startTask, completeTask, cancelTask, reopenTask, isLoading } =
-    useTaskActions();
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const {
+    startTask,
+    completeTask,
+    cancelTask,
+    reopenTask,
+    deleteTask,
+    isLoading,
+  } = useTaskActions();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
@@ -62,6 +69,17 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onRefresh }) => {
       onRefresh();
     } catch (error) {
       // Error is handled by the hook
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Tem certeza que deseja excluir esta tarefa?")) {
+      try {
+        await deleteTask(task.id);
+        onRefresh();
+      } catch (error) {
+        console.error("Erro ao excluir tarefa:", error);
+      }
     }
   };
 
@@ -157,7 +175,35 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onRefresh }) => {
             </Button>
           )}
         </div>
+        <div className="flex gap-1 pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsEditModalOpen(true)}
+            disabled={isLoading}
+            className="flex-1"
+          >
+            <Edit className="mr-1 h-3 w-3" />
+            Editar
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleDelete}
+            disabled={isLoading}
+            className="flex-1"
+          >
+            <Trash2 className="mr-1 h-3 w-3" />
+            Excluir
+          </Button>
+        </div>
       </CardContent>
+      <TaskForm
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={onRefresh}
+        task={task}
+      />
     </Card>
   );
 };
