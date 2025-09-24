@@ -1,3 +1,10 @@
+export enum StatusProjeto {
+  PLANEJADO = "PLANEJADO",
+  EM_ANDAMENTO = "EM_ANDAMENTO",
+  CONCLUIDO = "CONCLUIDO",
+  CANCELADO = "CANCELADO",
+}
+
 export interface CreateProjectRequest {
   nome: string
   descricao: string
@@ -26,7 +33,7 @@ export interface ProjectResponse {
     nomeCompleto: string
     email: string
   }
-  status?: "ATIVO" | "CONCLUIDO" | "CANCELADO"
+  status?: StatusProjeto
   createdAt?: string
   updatedAt?: string
 }

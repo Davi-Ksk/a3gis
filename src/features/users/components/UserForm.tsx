@@ -238,22 +238,28 @@ export const UserForm: React.FC<UserFormProps> = ({
                 Perfil
               </label>
               <Select
-                value={userProfileToString(formData.perfil)}
-                onValueChange={(value: string) =>
+                value={formData.perfil}
+                onValueChange={(value: UserProfile) =>
                   setFormData((prev) => ({
                     ...prev,
-                    perfil: value.toString() as unknown as UserProfile,
+                    perfil: value,
                   }))
                 }
                 disabled={isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione um perfil">
+                    {userProfileToString(formData.perfil)}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="COLABORADOR">Colaborador</SelectItem>
-                  <SelectItem value="GERENTE">Gerente</SelectItem>
-                  <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
+                  <SelectItem value={UserProfile.COLABORADOR}>
+                    Colaborador
+                  </SelectItem>
+                  <SelectItem value={UserProfile.GERENTE}>Gerente</SelectItem>
+                  <SelectItem value={UserProfile.ADMINISTRADOR}>
+                    Administrador
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
