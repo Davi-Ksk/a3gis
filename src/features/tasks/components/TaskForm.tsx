@@ -21,8 +21,13 @@ import {
   DialogTitle,
 } from "../../../components/ui/dialog";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
-import type { CreateTaskRequest, UpdateTaskRequest, TaskResponse } from "../dtos/Task.dto";
+import type {
+  CreateTaskRequest,
+  UpdateTaskRequest,
+  TaskResponse,
+} from "../dtos/Task.dto";
 import { useTaskActions } from "../hooks/useTaskActions";
+import { useCreateTask } from "../hooks/useCreateTask"; // Import the new hook
 import { useUsers } from "../../users/hooks/useUsers";
 import { useProjects } from "../../projects/hooks/useProjects";
 import { Loader2 } from "lucide-react";
@@ -50,9 +55,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     responsavelId: task?.responsavelId?.toString() || "",
   });
 
-  const { createTask, updateTask, isLoading, error } = useTaskActions(); // Use useTaskActions
+  const { updateTask, isLoading: isUpdating, error: updateError } = useTaskActions();
+  const { mutate: createTaskMutation, isPending: isCreating, error: createError } = useCreateTask(projectId || 0); // Pass projectId
   const { users } = useUsers();
   const { projects } = useProjects();
+
+  const isLoading = isCreating || isUpdating;
+  const error = createError || updateError;
 
   useEffect(() => {
     if (isOpen && task) {
@@ -91,7 +100,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         await updateTask(task.id, payload as UpdateTaskRequest);
       } else {
         // Creating new task
-        await createTask(payload as CreateTaskRequest);
+        await createTaskMutation(payload as CreateTaskRequest);
       }
       onSuccess();
       onClose();
@@ -114,7 +123,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-                    <DialogTitle>{task ? "Editar Tarefa" : "Criar Nova Tarefa"}</DialogTitle>
+          <DialogTitle>
+            {task ? "Editar Tarefa" : "Criar Nova Tarefa"}
+          </DialogTitle>
           <DialogDescription>
             {task
               ? "Edite as informações da tarefa."
@@ -125,7 +136,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{error.toString()}</AlertDescription>
             </Alert>
           )}
 

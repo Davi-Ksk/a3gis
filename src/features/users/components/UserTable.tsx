@@ -26,6 +26,7 @@ import { UserProfile, type UserResponse } from "../dtos/User.dto";
 import { useDeleteUser } from "../hooks/useDeleteUser";
 import { Edit, Trash2, Loader2 } from "lucide-react";
 import { userProfileToString } from "@/lib/utils";
+import { useAuth } from "../../../providers/AuthProvider";
 
 interface UserTableProps {
   users: UserResponse[];
@@ -39,10 +40,7 @@ export const UserTable: React.FC<UserTableProps> = ({
   onRefresh,
 }) => {
   const { deleteUser, isLoading: isDeleting } = useDeleteUser();
-
-  const currentUser = localStorage.getItem(
-    "currentUser"
-  ) as UserResponse | null;
+  const { user: currentUser } = useAuth();
 
   const handleDelete = async (userId: number) => {
     try {
